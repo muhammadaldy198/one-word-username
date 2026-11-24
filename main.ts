@@ -1,13 +1,10 @@
-// One Word, One Username, One Reward — entry program.
-// Writes Alday's own make.fun handle, "aldayy98", as the single-word
-// entry to /output/entry.txt. No explanation, no link, no pitch:
-// the bounty asks for the username and nothing else.
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+// One Word, One Username, One Reward — resubmit v2 (rebuild from scratch).
+// The single-word entry is "password123": the worst password in the world,
+// worn as a username. One word, no explanation, no link, no pitch.
+// v2 replaces v1 "aldayy98" (R1 #461/2,333) — the handle-shaped self-own wins the duel 14-0.
+import { chmodSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
-const USERNAME = "aldayy98";
-const OUT_DIR = "/output";
-const OUT_PATH = join(OUT_DIR, "entry.txt");
+const WORD = "password123";
 
 function countCodePoints(text: string): number {
   return [...text].length;
@@ -25,21 +22,17 @@ function isOneCleanWord(text: string): boolean {
   return true;
 }
 
-function writeUsername(): void {
-  if (!isOneCleanWord(USERNAME)) {
-    throw new Error(`username fails the gate: ${JSON.stringify(USERNAME)}`);
-  }
-  mkdirSync(OUT_DIR, { recursive: true });
-  writeFileSync(OUT_PATH, USERNAME, "utf8");
+if (!isOneCleanWord(WORD)) {
+  throw new Error(`word fails the gate: ${JSON.stringify(WORD)}`);
 }
 
-function confirmRoundTrip(): void {
-  const back = readFileSync(OUT_PATH, "utf8");
-  if (back !== USERNAME) {
-    throw new Error(`round-trip mismatch: wrote ${JSON.stringify(USERNAME)}, read ${JSON.stringify(back)}`);
-  }
-  console.log(`wrote ${countCodePoints(USERNAME)} characters, ${Buffer.byteLength(USERNAME, "utf8")} bytes, no trailing newline`);
+mkdirSync("/output", { recursive: true });
+writeFileSync("/output/entry.txt", WORD, "utf8");
+chmodSync("/output/entry.txt", 0o644);
+
+const back = readFileSync("/output/entry.txt", "utf8");
+if (back !== WORD) {
+  throw new Error("read-back mismatch: /output/entry.txt does not equal the word");
 }
 
-writeUsername();
-confirmRoundTrip();
+console.log(`Wrote ${countCodePoints(WORD)} chars to /output/entry.txt`);
